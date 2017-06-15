@@ -1,13 +1,23 @@
 <template>
   <div id="app">
+
+    <!-- (非显示) 从Redmine读入的table -->
     <div class="sample hide">
       <table class="raw" v-html="rawTableHtml" ref="rawTable"></table>
     </div>
-    <div class="control">
-      <span><input type="text" v-model="row"></span>
-      <span><input type="text" v-model="col"></span>
+
+    <!-- 控制按钮部分 -->
+    <div class="control margin-bottom-10">
+      <button>
+        <i class="fa fa-search"></i>
+        查找
+      </button>
+      <sub-add-input :value="row" @changeValue="changeRow"></sub-add-input>
+      <sub-add-input :value="col" @changeValue="changeCol"></sub-add-input>
     </div>
-    <div class="preview">
+
+    <!-- 预览 & 可编辑 table 部分 -->
+    <div class="preview margin-bottom-10">
       <table cellpadding="0" cellspacing="0">
         <tr v-for="(tdArr,index) in tableArr" :key="index">
           <td
@@ -26,7 +36,7 @@
                   @focusout="toText(td)">
                 </textarea>
                 <div class="button">
-                  <button @click.stop="toText(td)">×</button>
+                  <i class="fa fa-save" @click.stop="toText(td)"></i>
                 </div>
               </div>
             </div>
@@ -34,14 +44,18 @@
         </tr>
       </table>
     </div>
+
+    <!-- Redmine Texttile 显示部分 -->
     <div class="copy">
       <textarea name="" id="">{{wikiStr}}</textarea>
     </div>
+
   </div>
 </template>
 <script>
 import templateFactory from './template-factory.js'
 import common from './common.js'
+import SubAddInput from './components/SubAddInput.vue'
 
 export default {
   name: 'app',
@@ -52,6 +66,10 @@ export default {
       rawTableHtml: templateFactory.create(3,4),
       tableArr: []
     }
+  },
+
+  components: {
+    SubAddInput
   },
 
   mounted(){
@@ -84,6 +102,12 @@ export default {
     },
     toText(td){
       td.mode = 'text';
+    },
+    changeRow(value){
+      this.row += value;
+    },
+    changeCol(value){
+      this.col += value;
     },
     _getTableArrFromHtml(){
       var tableArr = [];
@@ -154,8 +178,20 @@ export default {
 * {
   box-sizing: border-box;
 }
+
+i.fa {
+  cursor:pointer;
+}
+i.fa:hover {
+  color: cadetblue;
+}
+
 .hide {
   display:none;
+}
+
+.margin-bottom-10 {
+  margin-bottom: 10px;
 }
 table {
   table-layout: fixed;
@@ -211,5 +247,9 @@ td.th {
 .copy textarea {
   min-width: 400px;
   min-height: 200px;
+}
+
+div.button i.fa-save {
+  background-color: white;
 }
 </style>
