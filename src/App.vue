@@ -2,7 +2,7 @@
   <div id="app">
 
     <!-- (非显示) 从Redmine读入的table -->
-    <div class="sample">
+    <div class="sample hide">
       <table class="raw" v-html="rawTableHtml" ref="rawTable"></table>
     </div>
 
@@ -25,7 +25,7 @@
             :colspan='td.colspan'
             :rowspan='td.rowspan'
             :class='td.type.toLowerCase()'
-            @click="toEdit(td)">
+            @click.stop="toEdit(td)">
             
             <div>
               <div class="text">{{td.value}}</div>
@@ -109,6 +109,14 @@ export default {
     changeCol(value){
       this.col += value;
     },
+    appClick(){
+      var arr = this.tableArr;
+      arr.forEach(tds => {
+        tds.forEach(td => {
+          td.mode = "text";
+        })
+      });
+    },
     search(){
       common.sendMsg({
         type: "find_table"
@@ -118,10 +126,6 @@ export default {
         }
         this.rawTableHtml = response;
       })
-
-      // this.rawTableHtml = `
-      // <tr><td>111111111</td></tr>
-      // `
     },
     _getTableArrFromHtml(){
       var tableArr = [];
@@ -168,7 +172,9 @@ export default {
     _getValue(tdDom){
       var atag = tdDom.querySelector("a");
       if(atag){
-        return "#" + atag.innerHTML;
+        var text = atag.innerHTML;
+        var href = atag.getAttribute("href");
+        return `"${text}":${href}`;
       }else {
         return tdDom.innerHTML;
       }
@@ -218,7 +224,7 @@ table {
   border-collapse: collapse;
   border-left: 1px solid black;
   border-bottom: 1px solid black;
-  min-width: 400px;
+  min-width: 800px;
 }
 
 th, td {
