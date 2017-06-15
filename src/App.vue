@@ -2,13 +2,13 @@
   <div id="app">
 
     <!-- (非显示) 从Redmine读入的table -->
-    <div class="sample hide">
+    <div class="sample">
       <table class="raw" v-html="rawTableHtml" ref="rawTable"></table>
     </div>
 
     <!-- 控制按钮部分 -->
     <div class="control margin-bottom-10">
-      <button>
+      <button @click="search()">
         <i class="fa fa-search"></i>
         查找
       </button>
@@ -87,7 +87,7 @@ export default {
           var headStr = headFlag ? "_." : "";
           var colspanStr = colspan > 1 ? "\\" + colspan + "." : "";
           var rowspan = rowspan > 1 ? "/" + rowspan + "." : "";
-          return [headStr, colspanStr, colspanStr, td.value].join(" ");
+          return [headStr, colspanStr, colspanStr, td.value].filter(item => item != "").join(" ");
         });
         lineArr.push("");
         lineArr.unshift("");
@@ -108,6 +108,20 @@ export default {
     },
     changeCol(value){
       this.col += value;
+    },
+    search(){
+      common.sendMsg({
+        type: "find_table"
+      }, (response) => {
+        if(!response){
+          return;
+        }
+        this.rawTableHtml = response;
+      })
+
+      // this.rawTableHtml = `
+      // <tr><td>111111111</td></tr>
+      // `
     },
     _getTableArrFromHtml(){
       var tableArr = [];
@@ -163,7 +177,11 @@ export default {
 
   watch:{
     rawTableHtml(html){
-      this.tableArr = this._getTableArrFromHtml();
+      setTimeout(() => {
+        var tableArr = this.tableArr = this._getTableArrFromHtml();
+        this.row = tableArr.length || 0;
+        this.col = (tableArr[0] && tableArr[0].length) || 0;
+      },100)
     },
     row(row){
       common.adjustArrSize(this.tableArr,row, this.col);
@@ -177,6 +195,8 @@ export default {
 <style>
 * {
   box-sizing: border-box;
+  font-size: 16px;
+  font-family: sans-serif;
 }
 
 i.fa {
