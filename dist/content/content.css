@@ -1,0 +1,20 @@
+.wiki_find {
+  animation: find_mark 2s ease 0s;
+}
+
+@keyframes find_mark {
+  0% {
+    outline: 3px solid blue;
+    outline-offset: 20px;
+  }
+
+  30% {
+    outline: 3px solid blue;
+    outline-offset: 0px;
+
+  }
+
+  100% {
+    outline: none;
+  }
+}
