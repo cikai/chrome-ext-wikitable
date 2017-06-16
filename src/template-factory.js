@@ -3,7 +3,7 @@ function createRow(col, headFlg) {
     if (headFlg) {
       return "<th>xxx</th>"
     } else {
-      return "<td>xxx</td>"
+      return '<td></td>'
     }
   }).join("");
 }

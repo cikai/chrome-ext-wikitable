@@ -12,6 +12,10 @@
         <i class="fa fa-search"></i>
         查找
       </button>
+      <button @click="copyToClickBoard">
+        <i class="fa fa-copy"></i>
+        拷贝Texttile
+      </button>
       <sub-add-input :value="row" @changeValue="changeRow"></sub-add-input>
       <sub-add-input :value="col" @changeValue="changeCol"></sub-add-input>
     </div>
@@ -25,15 +29,14 @@
             :colspan='td.colspan'
             :rowspan='td.rowspan'
             :class='td.type.toLowerCase()'
-            @click.stop="toEdit(td)">
+            @click="toEdit(td, $event)">
             
             <div>
               <div class="text">{{td.value}}</div>
               <div class="edit" :style="{display: td.mode == 'edit' ? '' : 'none'}">
                 <textarea 
                   name="" id=""
-                  v-model='td.value'
-                  @focusout="toText(td)">
+                  v-model='td.value'>
                 </textarea>
                 <div class="button">
                   <i class="fa fa-save" @click.stop="toText(td)"></i>
@@ -73,7 +76,17 @@ export default {
   },
 
   mounted(){
+    // init table
     this.tableArr = this._getTableArrFromHtml();
+    // global event
+    var bus = this.$getBus();
+    bus.$on("body/click", () => {
+      this.tableArr.forEach(tds => {
+        tds.forEach(td => {
+          td.mode = "text";
+        })
+      })
+    })
   },
 
   computed: {
@@ -97,8 +110,20 @@ export default {
   },
 
   methods: {
-    toEdit(td){
+    toEdit(td, e){ 
+      if(td.mode === "edit"){
+        return;
+      } 
       td.mode = "edit";
+
+      // focus
+      var target = e.target;
+      setTimeout(() => {
+        var ta = target.querySelector("textarea");
+        if(ta){
+          ta.focus();
+        }
+      })
     },
     toText(td){
       td.mode = 'text';
@@ -126,6 +151,12 @@ export default {
         }
         this.rawTableHtml = response;
       })
+    },
+    copyToClickBoard(){
+      var ta = document.querySelector(".copy textarea");
+      ta.select();
+      document.execCommand("copy");
+      ta.blur();
     },
     _getTableArrFromHtml(){
       var tableArr = [];
@@ -172,12 +203,23 @@ export default {
     _getValue(tdDom){
       var atag = tdDom.querySelector("a");
       if(atag){
-        var text = atag.innerHTML;
-        var href = atag.getAttribute("href");
-        return `"${text}":${href}`;
+        // 带有超链接的内容
+        // <a href="www.baidu.com">BAIDU</a> => "BAIDU":http://www.baidu.com
+        var domStr = tdDom.innerHTML;
+        var reg = new RegExp("<a.*?</a>", "g");
+        console.log(domStr, reg, reg.test(domStr));
+        return domStr.replace(reg, (matchATag) => {
+          return this._getValueFromATag(matchATag);
+        })
       }else {
+        // 普通的文本内容
         return tdDom.innerHTML;
       }
+    },
+    _getValueFromATag(atagStr){
+      var reg = new RegExp(`<a.*?href="(.*?)".*?>(.*?)</a>`)
+      var result = reg.exec(atagStr);
+      return ` "${result[2]}":${result[1]} `;
     }
   },
 
@@ -199,72 +241,6 @@ export default {
 }
 </script>
 <style>
-* {
-  box-sizing: border-box;
-  font-size: 16px;
-  font-family: sans-serif;
-}
-
-i.fa {
-  cursor:pointer;
-}
-i.fa:hover {
-  color: cadetblue;
-}
-
-.hide {
-  display:none;
-}
-
-.margin-bottom-10 {
-  margin-bottom: 10px;
-}
-table {
-  table-layout: fixed;
-  border-collapse: collapse;
-  border-left: 1px solid black;
-  border-bottom: 1px solid black;
-  min-width: 800px;
-}
-
-th, td {
-  padding: 0px;
-  position:relative;
-  white-space: pre;
-}
-
-th {
-  border-top: 1px solid black;
-  border-right: 1px solid black;
-}
-
-td {
-  border-top: 1px solid black;
-  border-right: 1px solid black;
-}
-
-td div.edit {
-  z-index: 100;
-  border: 1px solid aliceblue;
-  position: absolute;
-  left: 0px;
-  top: 0px;
-
-  width:100%;
-  height: 100%;
-}
-
-td div.button {
-  position: absolute;
-  right:0px;
-  bottom: 0px;
-  z-index: 100000;
-}
-
-td.th {
-  font-weight:bold;
-}
-
 .edit textarea {
   width: 100%;
   height: 100%;

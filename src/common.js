@@ -4,7 +4,7 @@ function getDefaultNode(){
     type: 'TD',
     colspan: 1,
     rowspan: 1,
-    value: 'xxx'
+    value: ''
   }
 }
 

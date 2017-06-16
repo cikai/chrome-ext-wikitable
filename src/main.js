@@ -4,15 +4,29 @@ import Vue from 'vue'
 import App from './App'
 
 import fontawesome from './css/font-awesome.css'
+import commoncss from './css/common.css'
+import GlobalEvent from './global_event.js';
 
 Vue.config.productionTip = false
 
+Vue.use(GlobalEvent);
+
 /* eslint-disable no-new */
-new Vue({
+var main = new Vue({
   el: '#app',
   template: '<App/>',
   components: { App }
 })
+
+var bus = main.$getBus();
+document.body.addEventListener("click", (e) => {
+  var target = e.target;
+  if(target.closest("div.preview")) {
+    return;
+  }
+  bus.$emit("body/click");
+})
+
 
 
 
