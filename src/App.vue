@@ -113,13 +113,14 @@ export default {
     toEdit(td, e){ 
       if(td.mode === "edit"){
         return;
-      } 
+      }
       td.mode = "edit";
 
       // focus
-      var target = e.target;
+      var target = e.currentTarget;
       setTimeout(() => {
         var ta = target.querySelector("textarea");
+        console.log(ta);
         if(ta){
           ta.focus();
         }
@@ -247,7 +248,7 @@ export default {
 }
 
 .copy textarea {
-  min-width: 400px;
+  width: 100%;
   min-height: 200px;
 }
 
