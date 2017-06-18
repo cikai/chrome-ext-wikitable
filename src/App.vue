@@ -100,7 +100,7 @@ export default {
           var headStr = headFlag ? "_." : "";
           var colspanStr = colspan > 1 ? "\\" + colspan + "." : "";
           var rowspan = rowspan > 1 ? "/" + rowspan + "." : "";
-          return [headStr, colspanStr, colspanStr, td.value].filter(item => item != "").join(" ");
+          return [headStr, rowspan, colspanStr, td.value].filter(item => item != "").join(" ");
         });
         lineArr.push("");
         lineArr.unshift("");
@@ -176,8 +176,8 @@ export default {
           }
           var node = {
             type: thtdItem.nodeName,
-            rowspan: thtdItem.getAttribute("rowspan") || 1,
-            colspan: thtdItem.getAttribute("clospan") || 1,
+            rowspan: thtdItem.rowSpan || 1,
+            colspan: thtdItem.colSpan || 1,
             lineLast: lineLast,
             value: this._getValue(thtdItem),
             mode: 'text'
@@ -206,7 +206,7 @@ export default {
       if(atag){
         // 带有超链接的内容
         // <a href="www.baidu.com">BAIDU</a> => "BAIDU":http://www.baidu.com
-        var domStr = tdDom.innerHTML;
+        var domStr = tdDom.innerText;
         var reg = new RegExp("<a.*?</a>", "g");
         console.log(domStr, reg, reg.test(domStr));
         return domStr.replace(reg, (matchATag) => {
@@ -214,7 +214,7 @@ export default {
         })
       }else {
         // 普通的文本内容
-        return tdDom.innerHTML;
+        return tdDom.innerText;
       }
     },
     _getValueFromATag(atagStr){
