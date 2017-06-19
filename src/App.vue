@@ -8,6 +8,7 @@
 
     <!-- 控制按钮部分 -->
     <div class="control margin-bottom-10">
+      <button @click="testBtn" style="display:none">test</button>
       <button @click="search()">
         <i class="fa fa-search"></i>
         查找
@@ -153,6 +154,9 @@ export default {
         this.rawTableHtml = response;
       })
     },
+    testBtn(){
+      this.rawTableHtml = templateFactory.getSampleTable();
+    },
     copyToClickBoard(){
       var ta = document.querySelector(".copy textarea");
       ta.select();
@@ -206,7 +210,7 @@ export default {
       if(atag){
         // 带有超链接的内容
         // <a href="www.baidu.com">BAIDU</a> => "BAIDU":http://www.baidu.com
-        var domStr = tdDom.innerText;
+        var domStr = tdDom.innerHTML;
         var reg = new RegExp("<a.*?</a>", "g");
         console.log(domStr, reg, reg.test(domStr));
         return domStr.replace(reg, (matchATag) => {
@@ -234,6 +238,7 @@ export default {
     },
     row(row){
       common.adjustArrSize(this.tableArr,row, this.col);
+      console.log("1111", this.tableArr);
     },
     col(col){
       common.adjustArrSize(this.tableArr,this.row, col);
@@ -242,6 +247,13 @@ export default {
 }
 </script>
 <style>
+
+#app {
+  position: relative;
+  width: calc(100% - 20px);
+  margin-left: 10px;
+  margin-top: 10px;
+}
 .edit textarea {
   width: 100%;
   height: 100%;
@@ -254,5 +266,9 @@ export default {
 
 div.button i.fa-save {
   background-color: white;
+}
+
+.preview table .th textarea {
+  font-weight: bold;
 }
 </style>
