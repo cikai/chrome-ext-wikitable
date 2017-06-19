@@ -65,9 +65,9 @@ export default {
   name: 'app',
   data() {
     return {
-      row: 3,
-      col: 4,
-      rawTableHtml: templateFactory.create(3,4),
+      row: 0,
+      col: 0,
+      rawTableHtml: "",
       tableArr: []
     }
   },
@@ -77,8 +77,8 @@ export default {
   },
 
   mounted(){
-    // init table
-    this.tableArr = this._getTableArrFromHtml();
+    this.initRawHtml();
+    
     // global event
     var bus = this.$getBus();
     bus.$on("body/click", () => {
@@ -111,6 +111,19 @@ export default {
   },
 
   methods: {
+    
+    initRawHtml(){
+      chrome.storage.local.get((obj) => {
+        var tableArr = obj.tableArr;
+        if(tableArr){
+          this.tableArr = tableArr;
+        }else {
+          this.rawTableHtml = templateFactory.create(3,4)
+          this.tableArr = this._getTableArrFromHtml();
+        }
+      })
+    },
+
     toEdit(td, e){ 
       if(td.mode === "edit"){
         return;
@@ -121,7 +134,6 @@ export default {
       var target = e.currentTarget;
       setTimeout(() => {
         var ta = target.querySelector("textarea");
-        console.log(ta);
         if(ta){
           ta.focus();
         }
@@ -212,7 +224,6 @@ export default {
         // <a href="www.baidu.com">BAIDU</a> => "BAIDU":http://www.baidu.com
         var domStr = tdDom.innerHTML;
         var reg = new RegExp("<a.*?</a>", "g");
-        console.log(domStr, reg, reg.test(domStr));
         return domStr.replace(reg, (matchATag) => {
           return this._getValueFromATag(matchATag);
         })
@@ -236,9 +247,14 @@ export default {
         this.col = (tableArr[0] && tableArr[0].length) || 0;
       },100)
     },
+    tableArr(arr, oldArr){
+      console.log("in table arrr",arr, oldArr);
+      chrome.storage.local.set({
+        "tableArr": arr
+      });
+    },
     row(row){
       common.adjustArrSize(this.tableArr,row, this.col);
-      console.log("1111", this.tableArr);
     },
     col(col){
       common.adjustArrSize(this.tableArr,this.row, col);
