@@ -87,6 +87,16 @@ export default {
         })
       })
     })
+
+    // save to local storage
+    if(process.env.NODE_ENV == 'production'){
+      setInterval(() => {
+        chrome.storage.local.set({
+          "tableArr": this.tableArr
+        });
+      },1000)
+    }
+
   },
 
   computed: {
@@ -156,17 +166,9 @@ export default {
     changeCol(value){
       this.col += value;
     },
-    appClick(){
-      var arr = this.tableArr;
-      arr.forEach(tds => {
-        tds.forEach(td => {
-          td.mode = "text";
-        })
-      });
-    },
-    search(){
+    "search"(){
       if(process.env.NODE_ENV == 'development'){
-        this.testBtn();
+        this.getSampleHTML();
         return;
       }
 
@@ -179,7 +181,7 @@ export default {
         this.rawTableHtml = response;
       })
     },
-    testBtn(){
+    getSampleHTML(){
       this.rawTableHtml = templateFactory.getSampleTable();
     },
     copyToClickBoard(){
@@ -260,17 +262,6 @@ export default {
         this.col = (tableArr[0] && tableArr[0].length) || 0;
       },100)
     },
-    tableArr(arr, oldArr){
-
-      console.log("in table arrr",arr, oldArr);
-      if(process.env.NODE_ENV == 'development'){
-        return;
-      }
-      
-      chrome.storage.local.set({
-        "tableArr": arr
-      });
-    },
     row(row){
       common.adjustArrSize(this.tableArr,row, this.col);
     },
@@ -308,5 +299,10 @@ div.button i.fa-save {
 
 .preview table .th textarea {
   font-weight: bold;
+}
+
+.preview th,
+.preview td {
+  padding: 3px;
 }
 </style>
