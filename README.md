@@ -16,4 +16,8 @@
 
   [wikitable.crx](/crx/wikitable.crx)
 
+* 使用方法
+
+  [1.gif](/doc/1.gif)
+
 
