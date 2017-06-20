@@ -8,7 +8,6 @@
 
     <!-- 控制按钮部分 -->
     <div class="control margin-bottom-10">
-      <button @click="testBtn" style="display:none">test</button>
       <button @click="search()">
         <i class="fa fa-search"></i>
         查找
@@ -113,6 +112,15 @@ export default {
   methods: {
     
     initRawHtml(){
+
+      // 开发模式
+      if(process.env.NODE_ENV == 'development'){
+          this.rawTableHtml = templateFactory.create(3,4)
+          this.tableArr = this._getTableArrFromHtml();
+          return;
+      }
+
+      // chrome extension模式
       chrome.storage.local.get((obj) => {
         var tableArr = obj.tableArr;
         if(tableArr){
@@ -157,6 +165,11 @@ export default {
       });
     },
     search(){
+      if(process.env.NODE_ENV == 'development'){
+        this.testBtn();
+        return;
+      }
+
       common.sendMsg({
         type: "find_table"
       }, (response) => {
@@ -248,7 +261,12 @@ export default {
       },100)
     },
     tableArr(arr, oldArr){
+
       console.log("in table arrr",arr, oldArr);
+      if(process.env.NODE_ENV == 'development'){
+        return;
+      }
+      
       chrome.storage.local.set({
         "tableArr": arr
       });
@@ -264,9 +282,13 @@ export default {
 </script>
 <style>
 
+body {
+  width: 1000px;
+}
+
 #app {
   position: relative;
-  width: calc(100% - 20px);
+  width: 980px;
   margin-left: 10px;
   margin-top: 10px;
 }
