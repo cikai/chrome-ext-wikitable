@@ -37,7 +37,6 @@ function clearTableClass(){
       var type = request.type;
       var value = request.value;
 
-      console.log(type,value);
       if(type == 'find_table'){
         var table = findTable();
 

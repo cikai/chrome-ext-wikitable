@@ -135,6 +135,8 @@ export default {
         var tableArr = obj.tableArr;
         if(tableArr){
           this.tableArr = tableArr;
+          this.row = tableArr.length || 0;
+          this.col = (tableArr[0] && tableArr[0].length) || 0;
         }else {
           this.rawTableHtml = templateFactory.create(3,4)
           this.tableArr = this._getTableArrFromHtml();
@@ -273,16 +275,12 @@ export default {
 </script>
 <style>
 
-body {
+#app {
   width: 1000px;
+  position: relative;
+  padding: 5px;
 }
 
-#app {
-  position: relative;
-  width: 980px;
-  margin-left: 10px;
-  margin-top: 10px;
-}
 .edit textarea {
   width: 100%;
   height: 100%;
